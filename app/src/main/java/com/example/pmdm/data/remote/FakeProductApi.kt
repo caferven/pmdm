@@ -3,6 +3,7 @@ package com.example.pmdm.data.remote
 import java.io.IOException
 import java.net.URLEncoder
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * API falsa de productos para poder desarrollar sin servidor.
@@ -15,7 +16,7 @@ class FakeProductApi(private val simulateError: () -> Boolean = { false }) {
 
     /** Devuelve el catálogo tras una espera de 1,5 s que imita la latencia de la red. */
     suspend fun getProducts(): List<ProductDto> {
-        delay(1500)
+        delay(1500.milliseconds)
         if (simulateError()) throw IOException("Simulated network error")
         return catalog
     }
