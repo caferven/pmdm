@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Separación estándar entre elementos y bordes -->
+    <dimen name="padding_normal">16dp</dimen>
+    <!-- Separación pequeña, entre elementos muy relacionados -->
+    <dimen name="padding_small">8dp</dimen>
+    <!-- Tamaño de los iconos. En dp para que escale con la densidad de pantalla -->
+    <dimen name="icon_size">24dp</dimen>
+    <!-- Altura de los cuadros de demostración del catálogo de componentes -->
+    <dimen name="demo_box_height">96dp</dimen>
+</resources>

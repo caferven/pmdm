@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <!-- Tema de la ventana (lo que se ve antes de que Compose dibuje). Claro; la variante oscura está en values-night. -->
     <style name="Theme.PMDM" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>

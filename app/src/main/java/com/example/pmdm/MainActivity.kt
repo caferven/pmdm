@@ -4,44 +4,22 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.pmdm.ui.navigation.AppNavHost
 import com.example.pmdm.ui.theme.PMDMTheme
+import com.example.pmdm.util.logDebug
 
+/** Única Activity de la app: solo aloja la UI de Compose y su navegación. */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Demostración de Logcat: aparece en debug y se omite en release.
+        logDebug("MainActivity.onCreate: app started")
         enableEdgeToEdge()
         setContent {
+            // Cada pantalla trae su propio Scaffold (con su barra superior), por eso aquí no hay otro.
             PMDMTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppNavHost()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PMDMTheme {
-        Greeting("Android")
     }
 }

@@ -1,34 +1,32 @@
 package com.example.pmdm.ui.theme
 
 import androidx.compose.material3.Typography
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
+// Partimos de la escala tipográfica por defecto de Material 3 (tamaños, interlineado y espaciado ya
+// calibrados) y solo cambiamos lo que da personalidad a MiTienda: familia y peso de los títulos.
+// Los tamaños van en sp (no dp) para respetar el tamaño de letra que el usuario elige en Ajustes.
+private val defaultTypography = Typography()
+
+// Familia serif del sistema para los títulos. Usar fuentes propias (res/font) o descargables
+// (Google Fonts) requiere dependencias o archivos extra: se deja como ejercicio.
+private val TitleFontFamily = FontFamily.Serif
+
 val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+    headlineMedium = defaultTypography.headlineMedium.copy(
+        fontFamily = TitleFontFamily,
+        fontWeight = FontWeight.SemiBold,
     ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
+    headlineSmall = defaultTypography.headlineSmall.copy(
+        fontFamily = TitleFontFamily,
+        fontWeight = FontWeight.SemiBold,
+    ),
+    titleLarge = defaultTypography.titleLarge.copy(
+        fontFamily = TitleFontFamily,
+        fontWeight = FontWeight.SemiBold,
+    ),
+    // titleMedium se usa para el nombre y el precio en las tarjetas: algo más de peso para destacarlos.
+    titleMedium = defaultTypography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+    // El resto de estilos (body, label...) se queda con los valores por defecto.
 )

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Con el modo oscuro activo la ventana también es oscura: evita el parpadeo en blanco al abrir la app. -->
+    <style name="Theme.PMDM" parent="android:Theme.Material.NoActionBar" />
+</resources>

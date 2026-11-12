@@ -1,3 +1,84 @@
-<resources>
-    <string name="app_name">PMDM</string>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Idioma base (inglés). Android lo usa cuando no existe traducción para el idioma del usuario. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">MiTienda</string>
+
+    <string name="loading">Loading products…</string>
+    <!-- %1$s: detalle técnico del error -->
+    <string name="error_message">Something went wrong: %1$s</string>
+    <string name="retry">Retry</string>
+    <string name="no_products">No products found</string>
+
+    <!-- %1$.2f: precio con dos decimales -->
+    <string name="price_format">€%1$.2f</string>
+    <!-- Descripción para lectores de pantalla (TalkBack) de la foto del producto. %1$s: nombre -->
+    <string name="product_image_description">Photo of %1$s</string>
+
+    <!-- En inglés solo se usan one y other: el 0 cae en "other". "zero" se ignora (de ahí tools:ignore). -->
+    <plurals name="found_products" tools:ignore="UnusedQuantity">
+        <item quantity="zero">No products found</item>
+        <item quantity="one">%d product found</item>
+        <item quantity="other">%d products found</item>
+    </plurals>
+
+    <!-- Navegación -->
+    <string name="back">Back</string>
+    <string name="open_catalog">Component catalog</string>
+    <string name="product_detail_title">Product detail</string>
+    <string name="product_not_found">Product not found</string>
+    <!-- %1$s: nombre de la categoría -->
+    <string name="detail_category">Category: %1$s</string>
+
+    <!-- Catálogo de componentes: secciones -->
+    <string name="section_layouts">Layouts</string>
+    <string name="section_buttons">Buttons</string>
+    <string name="section_text_fields">Text fields</string>
+    <string name="section_card_list_item">Card with ListItem</string>
+    <string name="section_dialog_snackbar">Dialog and Snackbar</string>
+
+    <!-- Catálogo de componentes: contenido de los ejemplos -->
+    <!-- %1$d: número de elemento -->
+    <string name="sample_item">Item %1$d</string>
+    <string name="layout_column_title">Column with spacedBy</string>
+    <string name="layout_row_title">Row with SpaceEvenly and CenterVertically</string>
+    <string name="layout_box_title">Box with background and badge at TopEnd</string>
+    <string name="badge_new">New</string>
+    <string name="button_filled">Filled</string>
+    <string name="button_outlined">Outlined</string>
+    <string name="button_text">Text</string>
+    <string name="button_elevated">Elevated</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="list_item_headline">Free shipping</string>
+    <string name="list_item_supporting">On orders over €50</string>
+    <string name="delete_item">Delete item</string>
+    <string name="dialog_title">Delete item?</string>
+    <string name="dialog_text">This action cannot be undone.</string>
+    <string name="dialog_confirm">Delete</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="snackbar_item_deleted">Item deleted</string>
+    <string name="snackbar_undo">Undo</string>
+    <string name="snackbar_undone">Deletion undone</string>
+
+    <!-- Búsqueda, estados y acciones de la lista -->
+    <string name="search_hint">Search products</string>
+    <string name="clear_search">Clear search</string>
+    <string name="refresh">Refresh</string>
+    <string name="no_results">No products match your search</string>
+    <string name="add_favorite">Add to favorites</string>
+    <string name="remove_favorite">Remove from favorites</string>
+    <string name="share">Share</string>
+    <string name="delete">Delete</string>
+    <!-- Etiqueta de accesibilidad de la pulsación larga sobre una tarjeta -->
+    <string name="show_options">Show options</string>
+    <!-- %1$s: nombre del producto -->
+    <string name="product_deleted">%1$s deleted</string>
+    <string name="share_chooser_title">Share product</string>
+    <!-- %1$s: nombre; %2$.2f: precio -->
+    <string name="share_text">Check out %1$s for €%2$.2f on MiTienda</string>
+
+    <!-- Catálogo de componentes: simulación -->
+    <string name="section_simulation">Simulation</string>
+    <string name="force_network_error">Force network error</string>
+    <string name="force_network_error_hint">Turn it on, go back and tap Refresh to see the error state.</string>
 </resources>

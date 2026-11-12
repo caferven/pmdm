@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Imagen mostrada mientras se descarga la foto.
+     Lienzo de 200x150 (proporción 4:3 de las fotos) con el icono centrado: así, con ContentScale.Crop,
+     el icono no se estira. Gris neutro: se ve bien sobre el fondo claro y oscuro del tema. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="150dp"
+    android:viewportWidth="200"
+    android:viewportHeight="150">
+    <group
+        android:scaleX="2"
+        android:scaleY="2"
+        android:translateX="76"
+        android:translateY="51">
+        <path
+            android:fillColor="#FF9E9E9E"
+            android:pathData="M21,19V5c0,-1.1 -0.9,-2 -2,-2H5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h14c1.1,0 2,-0.9 2,-2zM8.5,13.5l2.5,3.01L14.5,12l4.5,6H5l3.5,-4.5z" />
+    </group>
+</vector>
