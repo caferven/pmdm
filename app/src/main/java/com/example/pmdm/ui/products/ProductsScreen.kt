@@ -270,10 +270,17 @@ private fun ProductList(
     Column {
         val count = products.size
         Text(
-            // pluralStringResource elige "one" u "other"; el 0 se trata aparte (ver ProductsUiState.Empty).
+            // pluralStringResource elige "one" u "other"; el 0 se trata aparte.
             text = pluralStringResource(R.plurals.found_products, count, count),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(padding),
+        )
+        val favorites = products.count { it.favorite }
+        Text(
+            text = pluralStringResource(R.plurals.found_favorites, favorites, favorites),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = padding, end = padding, bottom = dimensionResource(R.dimen.padding_small)),
         )
         LazyColumn(
             contentPadding = PaddingValues(start = padding, end = padding, bottom = padding),

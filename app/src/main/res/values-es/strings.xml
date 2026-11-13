@@ -8,14 +8,19 @@
     <string name="retry">Reintentar</string>
     <string name="no_products">No se han encontrado productos</string>
 
+    <string name="price_label">Precio</string>
     <string name="price_format">%1$.2f €</string>
     <string name="product_image_description">Foto de %1$s</string>
 
-    <!-- En español (reglas CLDR): one, many (millones: "1 millón de productos") y other. El 0 usa "other". -->
     <plurals name="found_products">
         <item quantity="one">%d producto encontrado</item>
         <item quantity="other">%d productos encontrados</item>
         <item quantity="many">%d de productos encontrados</item>
+    </plurals>
+    <plurals name="found_favorites">
+        <item quantity="one">%d favorito</item>
+        <item quantity="other">%d favoritos</item>
+        <item quantity="many">%d favoritos</item>
     </plurals>
 
     <!-- Navegación -->

@@ -40,6 +40,7 @@ class FakeProductApi(private val simulateError: () -> Boolean = { false }) {
             Triple("Football", "Sport", 25.50),
             Triple("Notebook", "Stationery", 5.90),
             Triple("Pen set", "Stationery", 9.75),
+            Triple("Desk organizer", "Stationery", 12.90)
         )
 
         val catalog = rawProducts.mapIndexed { index, (title, section, amount) ->

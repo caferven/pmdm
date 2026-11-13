@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Idioma base (inglés). Android lo usa cuando no existe traducción para el idioma del usuario. -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">MiTienda</string>
 
     <string name="loading">Loading products…</string>
@@ -10,15 +10,18 @@
     <string name="no_products">No products found</string>
 
     <!-- %1$.2f: precio con dos decimales -->
+    <string name="price_label">Price</string>
     <string name="price_format">€%1$.2f</string>
     <!-- Descripción para lectores de pantalla (TalkBack) de la foto del producto. %1$s: nombre -->
     <string name="product_image_description">Photo of %1$s</string>
 
-    <!-- En inglés solo se usan one y other: el 0 cae en "other". "zero" se ignora (de ahí tools:ignore). -->
-    <plurals name="found_products" tools:ignore="UnusedQuantity">
-        <item quantity="zero">No products found</item>
+    <plurals name="found_products">
         <item quantity="one">%d product found</item>
         <item quantity="other">%d products found</item>
+    </plurals>
+    <plurals name="found_favorites">
+        <item quantity="one">%d favorite</item>
+        <item quantity="other">%d favorites</item>
     </plurals>
 
     <!-- Navegación -->

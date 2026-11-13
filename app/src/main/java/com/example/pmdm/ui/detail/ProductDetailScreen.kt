@@ -107,6 +107,11 @@ fun ProductDetailContent(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Text(
+                            text = stringResource(R.string.price_label),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
                             text = stringResource(R.string.price_format, product.price),
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.primary,
