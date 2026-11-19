@@ -53,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pmdm.R
 import com.example.pmdm.domain.model.Product
+import com.example.pmdm.ui.components.BroadcastReceiverEffect
 import com.example.pmdm.ui.theme.PMDMTheme
 import kotlinx.coroutines.launch
 
@@ -85,6 +86,19 @@ fun ProductsScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val resources = LocalResources.current
+
+    // Broadcast del sistema: Android avisa a todas las apps cuando se activa o desactiva el modo avión.
+    // El receiver solo está registrado mientras esta pantalla está en composición.
+    BroadcastReceiverEffect(Intent.ACTION_AIRPLANE_MODE_CHANGED) { intent ->
+        // El estado viaja en un extra llamado "state" (no tiene constante pública en Intent).
+        val enabled = intent.getBooleanExtra("state", false)
+        scope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showSnackbar(
+                resources.getString(if (enabled) R.string.airplane_mode_on else R.string.airplane_mode_off),
+            )
+        }
+    }
 
     ProductsContent(
         state = state,
@@ -121,7 +135,12 @@ fun ProductsScreen(
     )
 }
 
-/** Abre el selector de aplicaciones de Android para compartir [text]. */
+/**
+ * Abre el selector de aplicaciones de Android para compartir [text].
+ *
+ * Es un intent **implícito**: solo declara la acción (`ACTION_SEND`) y el tipo de dato (`text/plain`).
+ * `createChooser` muestra la lista de apps que saben hacerlo y deja elegir al usuario.
+ */
 private fun shareProduct(context: Context, text: String, chooserTitle: String) {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"

@@ -27,6 +27,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Destino del intent explícito. exported="false": solo esta app puede abrirla. -->
+        <activity
+            android:name=".ui.about.AboutActivity"
+            android:exported="false"
+            android:label="@string/about_title"
+            android:theme="@style/Theme.PMDM" />
     </application>
 
 </manifest>

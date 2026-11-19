@@ -1,6 +1,9 @@
 package com.example.pmdm.ui.detail
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -9,12 +12,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -25,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clipToBounds
@@ -33,6 +42,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +52,9 @@ import com.example.pmdm.R
 import com.example.pmdm.domain.model.Product
 import com.example.pmdm.ui.components.ProductImage
 import com.example.pmdm.ui.theme.PMDMTheme
+import com.example.pmdm.util.dialStore
+import com.example.pmdm.util.openStoreMap
+import kotlinx.coroutines.launch
 
 /**
  * Pantalla de detalle con estado: obtiene su ViewModel y delega el dibujo en [ProductDetailContent],
@@ -56,7 +69,27 @@ fun ProductDetailScreen(
 ) {
     val viewModel: ProductDetailViewModel = viewModel(factory = ProductDetailViewModel.Factory)
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    ProductDetailContent(state = state, onBack = onBack, modifier = modifier)
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    // Los textos se leen aquí: stringResource no se puede llamar dentro de la corrutina.
+    val storeName = stringResource(R.string.store_name)
+    val noAppMessage = stringResource(R.string.no_app_for_action)
+
+    // Si ninguna app puede atender el intent implícito, se avisa en lugar de dejar el botón sin efecto.
+    fun showNoApp() {
+        scope.launch { snackbarHostState.showSnackbar(noAppMessage) }
+    }
+
+    ProductDetailContent(
+        state = state,
+        snackbarHostState = snackbarHostState,
+        onCallStoreClick = { if (!dialStore(context)) showNoApp() },
+        onMapClick = { if (!openStoreMap(context, storeName)) showNoApp() },
+        onBack = onBack,
+        modifier = modifier,
+    )
 }
 
 /** Contenido sin estado del detalle: barra con botón atrás y los datos del producto. */
@@ -64,6 +97,9 @@ fun ProductDetailScreen(
 @Composable
 fun ProductDetailContent(
     state: ProductDetailUiState,
+    snackbarHostState: SnackbarHostState,
+    onCallStoreClick: () -> Unit,
+    onMapClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -84,6 +120,7 @@ fun ProductDetailContent(
                 },
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             val product = state.product
@@ -116,9 +153,34 @@ fun ProductDetailContent(
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.primary,
                         )
+                        StoreActions(
+                            onCallStoreClick = onCallStoreClick,
+                            onMapClick = onMapClick,
+                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_normal)),
+                        )
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Botones que lanzan **intents implícitos**: la app no sabe (ni le importa) qué aplicación los atenderá.
+ * El usuario elige la suya (marcador, mapas...) y MiTienda no necesita ningún permiso.
+ */
+@Composable
+private fun StoreActions(onCallStoreClick: () -> Unit, onMapClick: () -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))) {
+        OutlinedButton(onClick = onCallStoreClick, modifier = Modifier.fillMaxWidth()) {
+            Icon(Icons.Filled.Call, contentDescription = null) // decorativo: el texto del botón ya lo dice
+            Spacer(Modifier.width(dimensionResource(R.dimen.padding_small)))
+            Text(stringResource(R.string.call_store))
+        }
+        OutlinedButton(onClick = onMapClick, modifier = Modifier.fillMaxWidth()) {
+            Icon(Icons.Filled.Place, contentDescription = null)
+            Spacer(Modifier.width(dimensionResource(R.dimen.padding_small)))
+            Text(stringResource(R.string.view_store_on_map))
         }
     }
 }
@@ -186,6 +248,9 @@ private fun ProductDetailContentPreview() {
                 product = Product(1, "Desk lamp", "Home", 24.90, "https://example.com/1.jpg"),
                 loading = false,
             ),
+            snackbarHostState = remember { SnackbarHostState() },
+            onCallStoreClick = {},
+            onMapClick = {},
             onBack = {},
         )
     }
@@ -195,6 +260,12 @@ private fun ProductDetailContentPreview() {
 @Composable
 private fun ProductDetailNotFoundPreview() {
     PMDMTheme {
-        ProductDetailContent(state = ProductDetailUiState(loading = false), onBack = {})
+        ProductDetailContent(
+            state = ProductDetailUiState(loading = false),
+            snackbarHostState = remember { SnackbarHostState() },
+            onCallStoreClick = {},
+            onMapClick = {},
+            onBack = {},
+        )
     }
 }

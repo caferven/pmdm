@@ -53,12 +53,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import android.content.Intent
 import com.example.pmdm.R
+import com.example.pmdm.ui.about.AboutActivity
+import com.example.pmdm.ui.components.BroadcastReceiverEffect
 import com.example.pmdm.ui.theme.PMDMTheme
 import kotlinx.coroutines.launch
 
@@ -105,6 +109,14 @@ fun ComponentCatalogContent(
     val deletedMessage = stringResource(R.string.snackbar_item_deleted)
     val undoLabel = stringResource(R.string.snackbar_undo)
     val undoneMessage = stringResource(R.string.snackbar_undone)
+    val broadcastMessage = stringResource(R.string.broadcast_received)
+    val aboutSource = stringResource(R.string.about_source_catalog)
+    val context = LocalContext.current
+
+    // Receptor del anuncio propio que envía el botón de la sección Intents.
+    BroadcastReceiverEffect(ACTION_DEMO_BROADCAST) {
+        scope.launch { snackbarHostState.showSnackbar(broadcastMessage) }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -138,6 +150,16 @@ fun ComponentCatalogContent(
             CardListItemSection()
             HorizontalDivider()
             DialogSnackbarSection(onDeleteClick = { showDialog = true })
+            HorizontalDivider()
+            IntentsSection(
+                // Intent explícito: se nombra la clase de la Activity que debe abrirse.
+                onOpenAbout = { context.startActivity(AboutActivity.createIntent(context, aboutSource)) },
+                // sendBroadcast envía el anuncio a todos los receivers registrados para esa acción.
+                // setPackage lo limita a esta app: sin eso, cualquier otra app podría recibirlo.
+                onSendBroadcast = {
+                    context.sendBroadcast(Intent(ACTION_DEMO_BROADCAST).setPackage(context.packageName))
+                },
+            )
             HorizontalDivider()
             SimulationSection(
                 forceNetworkError = forceNetworkError,
@@ -308,6 +330,24 @@ private fun DialogSnackbarSection(onDeleteClick: () -> Unit) {
         SectionTitle(R.string.section_dialog_snackbar)
         // Al pulsar se abre el AlertDialog de confirmación; si el usuario confirma, aparece el Snackbar con "Deshacer".
         Button(onClick = onDeleteClick) { Text(stringResource(R.string.delete_item)) }
+    }
+}
+
+/** Acción del anuncio de demostración. Se usa el nombre del paquete como prefijo para evitar colisiones. */
+private const val ACTION_DEMO_BROADCAST = "com.example.pmdm.action.DEMO_BROADCAST"
+
+// INTENTS
+@Composable
+private fun IntentsSection(onOpenAbout: () -> Unit, onSendBroadcast: () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))) {
+        SectionTitle(R.string.section_intents)
+        Button(onClick = onOpenAbout) { Text(stringResource(R.string.open_about)) }
+        OutlinedButton(onClick = onSendBroadcast) { Text(stringResource(R.string.send_broadcast)) }
+        Text(
+            text = stringResource(R.string.intents_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

@@ -87,4 +87,23 @@
     <string name="section_simulation">Simulation</string>
     <string name="force_network_error">Force network error</string>
     <string name="force_network_error_hint">Turn it on, go back and tap Refresh to see the error state.</string>
+
+    <!-- Intents -->
+    <string name="about_title">About</string>
+    <!-- %1$s: número de versión -->
+    <string name="about_version">Version %1$s</string>
+    <!-- %1$s: nombre de la pantalla desde la que se abrió -->
+    <string name="about_opened_from">Opened from: %1$s</string>
+    <string name="about_source_catalog">component catalog</string>
+    <string name="section_intents">Intents</string>
+    <string name="open_about">Open About (explicit intent)</string>
+    <string name="send_broadcast">Send broadcast</string>
+    <string name="intents_hint">The first button starts an Activity of this app. The second sends an announcement that this screen receives.</string>
+    <string name="broadcast_received">Broadcast received</string>
+    <string name="call_store">Call the store</string>
+    <string name="view_store_on_map">View store on map</string>
+    <string name="store_name">MiTienda store</string>
+    <string name="no_app_for_action">No app can handle this action</string>
+    <string name="airplane_mode_on">Airplane mode turned on</string>
+    <string name="airplane_mode_off">Airplane mode turned off</string>
 </resources>
