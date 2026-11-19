@@ -185,6 +185,7 @@ fun ProductsContent(
                     )
                     is ProductsUiState.Success -> ProductList(
                         products = state.products,
+                        showingSavedData = state.showingSavedData,
                         onProductClick = onProductClick,
                         onFavoriteClick = onFavoriteClick,
                         onShareClick = onShareClick,
@@ -261,6 +262,7 @@ private fun ErrorContent(message: String, onRetry: () -> Unit, modifier: Modifie
 @Composable
 private fun ProductList(
     products: List<Product>,
+    showingSavedData: Boolean,
     onProductClick: (Int) -> Unit,
     onFavoriteClick: (Int) -> Unit,
     onShareClick: (Product) -> Unit,
@@ -268,6 +270,15 @@ private fun ProductList(
 ) {
     val padding = dimensionResource(R.dimen.padding_normal)
     Column {
+        if (showingSavedData) {
+            // Aviso de que la lista viene de la caché: el último refresco falló.
+            Text(
+                text = stringResource(R.string.showing_saved_data),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(horizontal = padding),
+            )
+        }
         val count = products.size
         Text(
             // pluralStringResource elige "one" u "other"; el 0 se trata aparte (ver ProductsUiState.Empty).
@@ -333,6 +344,11 @@ private fun ProductsSuccessPreview() = PreviewContent(ProductsUiState.Success(pr
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun ProductsSuccessDarkPreview() = PreviewContent(ProductsUiState.Success(previewProducts))
+
+@Preview(showBackground = true)
+@Composable
+private fun ProductsSavedDataPreview() =
+    PreviewContent(ProductsUiState.Success(previewProducts, showingSavedData = true))
 
 @Preview(showBackground = true)
 @Composable

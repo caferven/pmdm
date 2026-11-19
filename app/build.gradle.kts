@@ -2,6 +2,7 @@
 plugins {
     alias(libs.plugins.android.application) // Convierte el módulo en una app Android (genera el APK)
     alias(libs.plugins.kotlin.compose)      // Compilador de Compose (transforma las funciones @Composable)
+    alias(libs.plugins.ksp)                 // Genera código en compilación (lo usa Room)
 }
 
 android {
@@ -90,6 +91,10 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
+    // Room: base de datos local. ksp() ejecuta el compiler, que genera la implementación del DAO.
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+
     // Coroutines: incluye kotlinx-coroutines-core (Flow, suspend) y Dispatchers.Main de Android
     implementation(libs.kotlinx.coroutines.android)
 
@@ -102,6 +107,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
 
     // Solo en debug: herramientas de Preview y de test de Compose
     debugImplementation(libs.androidx.compose.ui.test.manifest)

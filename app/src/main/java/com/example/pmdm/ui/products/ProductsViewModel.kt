@@ -28,13 +28,18 @@ sealed interface ProductsUiState {
     /** Se están pidiendo los datos. */
     data object Loading : ProductsUiState
 
-    /** Hay productos que mostrar. */
-    data class Success(val products: List<Product>) : ProductsUiState
+    /**
+     * Hay productos que mostrar.
+     *
+     * @property showingSavedData `true` si el último refresco falló y se están mostrando los productos
+     * guardados en la base de datos (la caché) en lugar de los más recientes.
+     */
+    data class Success(val products: List<Product>, val showingSavedData: Boolean = false) : ProductsUiState
 
     /** La carga terminó bien pero no hay ningún producto (o ninguno coincide con la búsqueda). */
     data object Empty : ProductsUiState
 
-    /** La carga falló; [message] describe el problema. */
+    /** La carga falló y no hay nada guardado que mostrar; [message] describe el problema. */
     data class Error(val message: String) : ProductsUiState
 }
 
@@ -67,10 +72,13 @@ class ProductsViewModel(
         // flatMapLatest: cada vez que cambia el texto se cancela la consulta anterior y se empieza otra.
         combine(query.flatMapLatest { getProducts(it) }, loading, error) { products, loading, error ->
             when {
-                error != null -> ProductsUiState.Error(error)
+                // Con productos guardados se muestran siempre, aunque se esté refrescando o el refresco falle:
+                // para eso sirve la caché. El error solo se nota con un aviso.
+                products.isNotEmpty() -> ProductsUiState.Success(products, showingSavedData = error != null)
                 loading -> ProductsUiState.Loading
-                products.isEmpty() -> ProductsUiState.Empty
-                else -> ProductsUiState.Success(products)
+                // Sin búsqueda activa y sin nada guardado, el fallo es lo único que se puede mostrar.
+                error != null && query.value.isBlank() -> ProductsUiState.Error(error)
+                else -> ProductsUiState.Empty
             }
         }.stateIn(
             scope = viewModelScope,

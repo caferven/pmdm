@@ -65,8 +65,8 @@ class ProductsViewModelTest {
     }
 
     @Test
-    fun whenRefreshFails_exposesError() = runTest {
-        val repository = FakeProductRepository(listOf(lamp)).apply { refreshError = IOException("boom") }
+    fun whenRefreshFailsWithoutSavedProducts_exposesError() = runTest {
+        val repository = FakeProductRepository(emptyList()).apply { refreshError = IOException("boom") }
         val viewModel = createViewModel(repository)
         keepCollecting(viewModel)
 
@@ -74,12 +74,23 @@ class ProductsViewModelTest {
     }
 
     @Test
-    fun retryAfterError_recovers() = runTest {
+    fun whenRefreshFailsWithSavedProducts_showsThemWithNotice() = runTest {
+        // La base de datos ya tenía productos de una ejecución anterior: se muestran aunque la red falle.
         val repository = FakeProductRepository(listOf(lamp)).apply { refreshError = IOException("boom") }
         val viewModel = createViewModel(repository)
         keepCollecting(viewModel)
 
+        assertEquals(ProductsUiState.Success(listOf(lamp), showingSavedData = true), viewModel.uiState.value)
+    }
+
+    @Test
+    fun retryAfterError_recovers() = runTest {
+        val repository = FakeProductRepository(emptyList()).apply { refreshError = IOException("boom") }
+        val viewModel = createViewModel(repository)
+        keepCollecting(viewModel)
+
         repository.refreshError = null
+        repository.products.value = listOf(lamp) // lo que dejaría el refresco correcto en la base de datos
         viewModel.refresh()
 
         assertEquals(ProductsUiState.Success(listOf(lamp)), viewModel.uiState.value)

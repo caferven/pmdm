@@ -22,7 +22,7 @@ class MiTiendaApp : Application(), SingletonImageLoader.Factory {
 
     override fun onCreate() {
         super.onCreate()
-        container = AppContainer()
+        container = AppContainer(this)
     }
 
     /**

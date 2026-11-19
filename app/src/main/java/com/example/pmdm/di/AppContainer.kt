@@ -1,5 +1,7 @@
 package com.example.pmdm.di
 
+import android.content.Context
+import com.example.pmdm.data.local.AppDatabase
 import com.example.pmdm.data.remote.FakeProductApi
 import com.example.pmdm.data.repository.ProductRepositoryImpl
 import com.example.pmdm.domain.repository.ProductRepository
@@ -10,9 +12,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * Contenedor de dependencias manual (más adelante veremos Hilt para la inyección de dependencias).
  *
  * Se crea una sola vez en [com.example.pmdm.MiTiendaApp], así que los objetos que construye
- * viven mientras viva la aplicación y se comparten entre pantallas.
+ * viven mientras viva la aplicación y se comparten entre pantallas. Recibe el [Context] porque la base de datos
+ * necesita acceso al almacenamiento de la app.
  */
-class AppContainer {
+class AppContainer(context: Context) {
 
     /**
      * Interruptor de demostración: cuando vale `true`, la API falsa falla. Puede activarse desde el catálogo de
@@ -22,8 +25,10 @@ class AppContainer {
 
     private val api = FakeProductApi(simulateError = { forceNetworkError.value })
 
-    /** Repositorio de productos. */
-    val productRepository: ProductRepository = ProductRepositoryImpl(api)
+    private val database = AppDatabase.create(context)
+
+    /** Repositorio de productos: red + base de datos local. */
+    val productRepository: ProductRepository = ProductRepositoryImpl(api, database.productDao())
 
     /** Caso de uso para listar y filtrar productos. */
     val getProductsUseCase = GetProductsUseCase(productRepository)

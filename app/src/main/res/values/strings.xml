@@ -6,6 +6,7 @@
     <string name="loading">Loading products…</string>
     <!-- %1$s: detalle técnico del error -->
     <string name="error_message">Something went wrong: %1$s</string>
+    <string name="showing_saved_data">Showing saved data. Could not refresh.</string>
     <string name="retry">Retry</string>
     <string name="no_products">No products found</string>
 
