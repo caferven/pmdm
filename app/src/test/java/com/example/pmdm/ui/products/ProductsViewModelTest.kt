@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.example.pmdm.domain.model.Product
 import com.example.pmdm.domain.usecase.GetProductsUseCase
 import com.example.pmdm.testing.FakeProductRepository
+import com.example.pmdm.testing.FakeSettingsRepository
 import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,8 +35,9 @@ class ProductsViewModelTest {
 
     private fun createViewModel(
         repository: FakeProductRepository,
+        settings: FakeSettingsRepository = FakeSettingsRepository(),
         savedState: SavedStateHandle = SavedStateHandle(),
-    ) = ProductsViewModel(GetProductsUseCase(repository), repository, savedState)
+    ) = ProductsViewModel(GetProductsUseCase(repository), repository, settings, savedState)
 
     // stateIn(WhileSubscribed) solo trabaja si hay alguien recogiendo el flujo.
     private fun TestScope.keepCollecting(viewModel: ProductsViewModel) {
@@ -121,7 +123,7 @@ class ProductsViewModelTest {
     fun query_isRestoredFromSavedState() = runTest {
         // Simula la recreación tras la muerte del proceso: el SavedStateHandle llega ya con el texto guardado.
         val restored = SavedStateHandle(mapOf("query" to "lamp"))
-        val viewModel = createViewModel(FakeProductRepository(listOf(lamp, mug)), restored)
+        val viewModel = createViewModel(FakeProductRepository(listOf(lamp, mug)), savedState = restored)
         keepCollecting(viewModel)
 
         assertEquals("lamp", viewModel.query.value)
@@ -149,5 +151,37 @@ class ProductsViewModelTest {
 
         val state = viewModel.uiState.value as ProductsUiState.Success
         assertTrue(state.products.single().favorite)
+    }
+
+    @Test
+    fun onlyFavorites_showsOnlyFavoriteProducts() = runTest {
+        val favoriteMug = mug.copy(favorite = true)
+        val viewModel = createViewModel(FakeProductRepository(listOf(lamp, favoriteMug)))
+        keepCollecting(viewModel)
+
+        viewModel.onOnlyFavoritesChange(true)
+
+        assertEquals(ProductsUiState.Success(listOf(favoriteMug)), viewModel.uiState.value)
+    }
+
+    @Test
+    fun onlyFavorites_withoutFavorites_exposesEmpty() = runTest {
+        val viewModel = createViewModel(FakeProductRepository(listOf(lamp, mug)))
+        keepCollecting(viewModel)
+
+        viewModel.onOnlyFavoritesChange(true)
+
+        assertEquals(ProductsUiState.Empty, viewModel.uiState.value)
+    }
+
+    @Test
+    fun onlyFavorites_isRestoredFromSettings() = runTest {
+        // Simula una nueva ejecución de la app: el ajuste ya estaba guardado.
+        val settings = FakeSettingsRepository(initialOnlyFavorites = true)
+        val viewModel = createViewModel(FakeProductRepository(listOf(lamp)), settings)
+        keepCollecting(viewModel)
+
+        assertTrue(viewModel.onlyFavorites.value)
+        assertEquals(ProductsUiState.Empty, viewModel.uiState.value)
     }
 }

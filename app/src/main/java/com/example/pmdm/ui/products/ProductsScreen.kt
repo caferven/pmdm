@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -78,6 +79,7 @@ fun ProductsScreen(
     // collectAsStateWithLifecycle deja de recoger el flujo cuando la app pasa a segundo plano.
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val query by viewModel.query.collectAsStateWithLifecycle()
+    val onlyFavorites by viewModel.onlyFavorites.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -87,8 +89,10 @@ fun ProductsScreen(
     ProductsContent(
         state = state,
         query = query,
+        onlyFavorites = onlyFavorites,
         snackbarHostState = snackbarHostState,
         onQueryChange = viewModel::onQueryChange,
+        onOnlyFavoritesChange = viewModel::onOnlyFavoritesChange,
         onRefresh = viewModel::refresh,
         onProductClick = onProductClick,
         onFavoriteClick = viewModel::toggleFavorite,
@@ -135,8 +139,10 @@ private fun shareProduct(context: Context, text: String, chooserTitle: String) {
 fun ProductsContent(
     state: ProductsUiState,
     query: String,
+    onlyFavorites: Boolean,
     snackbarHostState: SnackbarHostState,
     onQueryChange: (String) -> Unit,
+    onOnlyFavoritesChange: (Boolean) -> Unit,
     onRefresh: () -> Unit,
     onProductClick: (Int) -> Unit,
     onFavoriteClick: (Int) -> Unit,
@@ -168,6 +174,13 @@ fun ProductsContent(
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             // La búsqueda se pinta siempre, también en Loading/Error/Empty: así se puede corregir un texto sin resultados.
             SearchField(query = query, onQueryChange = onQueryChange)
+            // Ajuste persistente: se recuerda aunque se cierre la app (ver SettingsRepository).
+            FilterChip(
+                selected = onlyFavorites,
+                onClick = { onOnlyFavoritesChange(!onlyFavorites) },
+                label = { Text(stringResource(R.string.filter_only_favorites)) },
+                modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_normal)),
+            )
 
             Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                 // when sobre una sealed interface: el compilador exige tratar los cuatro estados.
@@ -179,7 +192,13 @@ fun ProductsContent(
                         modifier = Modifier.align(Alignment.Center),
                     )
                     ProductsUiState.Empty -> Text(
-                        text = stringResource(if (query.isBlank()) R.string.no_products else R.string.no_results),
+                        text = stringResource(
+                            when {
+                                query.isNotBlank() -> R.string.no_results
+                                onlyFavorites -> R.string.no_favorites
+                                else -> R.string.no_products
+                            },
+                        ),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.align(Alignment.Center).padding(dimensionResource(R.dimen.padding_normal)),
                     )
@@ -332,8 +351,10 @@ private fun PreviewContent(state: ProductsUiState, query: String = "") {
         ProductsContent(
             state = state,
             query = query,
+            onlyFavorites = false,
             snackbarHostState = remember { SnackbarHostState() },
             onQueryChange = {},
+            onOnlyFavoritesChange = {},
             onRefresh = {},
             onProductClick = {},
             onFavoriteClick = {},

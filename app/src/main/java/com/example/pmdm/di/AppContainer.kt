@@ -2,9 +2,12 @@ package com.example.pmdm.di
 
 import android.content.Context
 import com.example.pmdm.data.local.AppDatabase
+import com.example.pmdm.data.local.SettingsRepositoryImpl
+import com.example.pmdm.data.local.settingsDataStore
 import com.example.pmdm.data.remote.FakeProductApi
 import com.example.pmdm.data.repository.ProductRepositoryImpl
 import com.example.pmdm.domain.repository.ProductRepository
+import com.example.pmdm.domain.repository.SettingsRepository
 import com.example.pmdm.domain.usecase.GetProductsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -29,6 +32,9 @@ class AppContainer(context: Context) {
 
     /** Repositorio de productos: red + base de datos local. */
     val productRepository: ProductRepository = ProductRepositoryImpl(api, database.productDao())
+
+    /** Ajustes del usuario (DataStore). */
+    val settingsRepository: SettingsRepository = SettingsRepositoryImpl(context.applicationContext.settingsDataStore)
 
     /** Caso de uso para listar y filtrar productos. */
     val getProductsUseCase = GetProductsUseCase(productRepository)

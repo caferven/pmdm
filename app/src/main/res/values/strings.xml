@@ -7,6 +7,8 @@
     <!-- %1$s: detalle técnico del error -->
     <string name="error_message">Something went wrong: %1$s</string>
     <string name="showing_saved_data">Showing saved data. Could not refresh.</string>
+    <string name="filter_only_favorites">Only favorites</string>
+    <string name="no_favorites">No favorites yet</string>
     <string name="retry">Retry</string>
     <string name="no_products">No products found</string>
 

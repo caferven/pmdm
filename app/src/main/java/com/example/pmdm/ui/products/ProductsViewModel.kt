@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.pmdm.MiTiendaApp
 import com.example.pmdm.domain.model.Product
 import com.example.pmdm.domain.repository.ProductRepository
+import com.example.pmdm.domain.repository.SettingsRepository
 import com.example.pmdm.domain.usecase.GetProductsUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,6 +53,7 @@ sealed interface ProductsUiState {
 class ProductsViewModel(
     getProducts: GetProductsUseCase,
     private val repository: ProductRepository,
+    private val settings: SettingsRepository,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -66,18 +68,35 @@ class ProductsViewModel(
      */
     val query: StateFlow<String> = savedStateHandle.getStateFlow(QUERY_KEY, "")
 
+    /**
+     * Si la lista muestra solo los favoritos. A diferencia del texto de búsqueda (que es pasajero), es un ajuste:
+     * se guarda con DataStore y se recuerda al volver a abrir la app.
+     */
+    val onlyFavorites: StateFlow<Boolean> = settings.onlyFavorites.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = false,
+    )
+
     /** Estado observable por la UI. Combina los productos (ya filtrados) con los indicadores de carga y error. */
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<ProductsUiState> =
         // flatMapLatest: cada vez que cambia el texto se cancela la consulta anterior y se empieza otra.
-        combine(query.flatMapLatest { getProducts(it) }, loading, error) { products, loading, error ->
+        combine(
+            query.flatMapLatest { getProducts(it) },
+            onlyFavorites,
+            loading,
+            error,
+        ) { found, onlyFavorites, loading, error ->
+            // El filtro de favoritos se aplica sobre el resultado de la búsqueda por texto.
+            val products = if (onlyFavorites) found.filter { it.favorite } else found
             when {
                 // Con productos guardados se muestran siempre, aunque se esté refrescando o el refresco falle:
                 // para eso sirve la caché. El error solo se nota con un aviso.
                 products.isNotEmpty() -> ProductsUiState.Success(products, showingSavedData = error != null)
                 loading -> ProductsUiState.Loading
-                // Sin búsqueda activa y sin nada guardado, el fallo es lo único que se puede mostrar.
-                error != null && query.value.isBlank() -> ProductsUiState.Error(error)
+                // Sin filtros activos y sin nada guardado, el fallo es lo único que se puede mostrar.
+                error != null && query.value.isBlank() && !onlyFavorites -> ProductsUiState.Error(error)
                 else -> ProductsUiState.Empty
             }
         }.stateIn(
@@ -90,6 +109,11 @@ class ProductsViewModel(
 
     init {
         refresh()
+    }
+
+    /** Guarda en las preferencias si se deben mostrar solo los favoritos; la lista se vuelve a filtrar sola. */
+    fun onOnlyFavoritesChange(value: Boolean) {
+        viewModelScope.launch { settings.setOnlyFavorites(value) }
     }
 
     /** Guarda el nuevo texto de búsqueda; la lista se vuelve a filtrar sola. */
@@ -138,6 +162,7 @@ class ProductsViewModel(
                 ProductsViewModel(
                     container.getProductsUseCase,
                     container.productRepository,
+                    container.settingsRepository,
                     createSavedStateHandle(),
                 )
             }

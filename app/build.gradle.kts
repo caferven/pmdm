@@ -95,6 +95,9 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
 
+    // DataStore: ajustes del usuario (preferencias clave-valor)
+    implementation(libs.androidx.datastore.preferences)
+
     // Coroutines: incluye kotlinx-coroutines-core (Flow, suspend) y Dispatchers.Main de Android
     implementation(libs.kotlinx.coroutines.android)
 

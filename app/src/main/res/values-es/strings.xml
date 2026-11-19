@@ -6,6 +6,8 @@
     <string name="loading">Cargando productos…</string>
     <string name="error_message">Algo ha ido mal: %1$s</string>
     <string name="showing_saved_data">Mostrando datos guardados. No se pudo actualizar.</string>
+    <string name="filter_only_favorites">Solo favoritos</string>
+    <string name="no_favorites">Aún no tienes favoritos</string>
     <string name="retry">Reintentar</string>
     <string name="no_products">No se han encontrado productos</string>
 
