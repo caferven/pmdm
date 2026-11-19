@@ -9,9 +9,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.pmdm.MiTiendaApp
 import com.example.pmdm.domain.model.Product
+import com.example.pmdm.domain.model.RefreshError
+import com.example.pmdm.domain.model.RefreshException
 import com.example.pmdm.domain.repository.ProductRepository
 import com.example.pmdm.domain.repository.SettingsRepository
 import com.example.pmdm.domain.usecase.GetProductsUseCase
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -40,8 +43,12 @@ sealed interface ProductsUiState {
     /** La carga terminó bien pero no hay ningún producto (o ninguno coincide con la búsqueda). */
     data object Empty : ProductsUiState
 
-    /** La carga falló y no hay nada guardado que mostrar; [message] describe el problema. */
-    data class Error(val message: String) : ProductsUiState
+    /**
+     * La carga falló y no hay nada guardado que mostrar.
+     *
+     * @property reason causa clasificada; la UI elige el mensaje (traducido) que corresponde.
+     */
+    data class Error(val reason: RefreshError) : ProductsUiState
 }
 
 /**
@@ -60,7 +67,7 @@ class ProductsViewModel(
     // Estado de carga/error separado de los datos: los datos vienen del repositorio (Flow)
     // y esto lo controla el propio ViewModel.
     private val loading = MutableStateFlow(false)
-    private val error = MutableStateFlow<String?>(null)
+    private val error = MutableStateFlow<RefreshError?>(null)
 
     /**
      * Texto de la barra de búsqueda. Se lee del [SavedStateHandle]: cada vez que se escribe en él, Android
@@ -128,9 +135,11 @@ class ProductsViewModel(
             error.value = null
             try {
                 repository.refresh()
+            } catch (e: CancellationException) {
+                throw e // cancelar no es un error: se deja propagar (el finally apaga el indicador de carga)
             } catch (e: Exception) {
-                // El texto de la excepción no se traduce: es información técnica del origen.
-                error.value = e.message ?: e.javaClass.simpleName
+                // El repositorio ya clasifica los fallos de red; cualquier otra excepción es inesperada.
+                error.value = (e as? RefreshException)?.reason ?: RefreshError.UNKNOWN
             } finally {
                 loading.value = false
             }

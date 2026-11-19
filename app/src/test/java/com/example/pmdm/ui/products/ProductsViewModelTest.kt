@@ -2,10 +2,11 @@ package com.example.pmdm.ui.products
 
 import androidx.lifecycle.SavedStateHandle
 import com.example.pmdm.domain.model.Product
+import com.example.pmdm.domain.model.RefreshError
+import com.example.pmdm.domain.model.RefreshException
 import com.example.pmdm.domain.usecase.GetProductsUseCase
 import com.example.pmdm.testing.FakeProductRepository
 import com.example.pmdm.testing.FakeSettingsRepository
-import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -68,17 +69,27 @@ class ProductsViewModelTest {
 
     @Test
     fun whenRefreshFailsWithoutSavedProducts_exposesError() = runTest {
-        val repository = FakeProductRepository(emptyList()).apply { refreshError = IOException("boom") }
+        val repository = FakeProductRepository(emptyList()).apply { refreshError = RefreshException(RefreshError.NO_CONNECTION) }
         val viewModel = createViewModel(repository)
         keepCollecting(viewModel)
 
-        assertEquals(ProductsUiState.Error("boom"), viewModel.uiState.value)
+        assertEquals(ProductsUiState.Error(RefreshError.NO_CONNECTION), viewModel.uiState.value)
+    }
+
+    @Test
+    fun whenRefreshFailsUnexpectedly_exposesUnknownError() = runTest {
+        // Una excepción que no viene clasificada por el repositorio se trata como desconocida.
+        val repository = FakeProductRepository(emptyList()).apply { refreshError = IllegalStateException("boom") }
+        val viewModel = createViewModel(repository)
+        keepCollecting(viewModel)
+
+        assertEquals(ProductsUiState.Error(RefreshError.UNKNOWN), viewModel.uiState.value)
     }
 
     @Test
     fun whenRefreshFailsWithSavedProducts_showsThemWithNotice() = runTest {
         // La base de datos ya tenía productos de una ejecución anterior: se muestran aunque la red falle.
-        val repository = FakeProductRepository(listOf(lamp)).apply { refreshError = IOException("boom") }
+        val repository = FakeProductRepository(listOf(lamp)).apply { refreshError = RefreshException(RefreshError.NO_CONNECTION) }
         val viewModel = createViewModel(repository)
         keepCollecting(viewModel)
 
@@ -87,7 +98,7 @@ class ProductsViewModelTest {
 
     @Test
     fun retryAfterError_recovers() = runTest {
-        val repository = FakeProductRepository(emptyList()).apply { refreshError = IOException("boom") }
+        val repository = FakeProductRepository(emptyList()).apply { refreshError = RefreshException(RefreshError.NO_CONNECTION) }
         val viewModel = createViewModel(repository)
         keepCollecting(viewModel)
 

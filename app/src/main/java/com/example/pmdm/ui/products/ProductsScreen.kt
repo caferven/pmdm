@@ -53,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pmdm.R
 import com.example.pmdm.domain.model.Product
+import com.example.pmdm.domain.model.RefreshError
 import com.example.pmdm.ui.components.BroadcastReceiverEffect
 import com.example.pmdm.ui.theme.PMDMTheme
 import kotlinx.coroutines.launch
@@ -206,7 +207,7 @@ fun ProductsContent(
                 when (state) {
                     ProductsUiState.Loading -> LoadingContent(Modifier.align(Alignment.Center))
                     is ProductsUiState.Error -> ErrorContent(
-                        message = state.message,
+                        reason = state.reason,
                         onRetry = onRefresh,
                         modifier = Modifier.align(Alignment.Center),
                     )
@@ -283,14 +284,24 @@ private fun LoadingContent(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ErrorContent(message: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
+private fun ErrorContent(reason: RefreshError, onRetry: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.padding(dimensionResource(R.dimen.padding_normal)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small)),
     ) {
         Text(
-            text = stringResource(R.string.error_message, message),
+            // Cada causa tiene su propio mensaje: «sin conexión» se arregla distinto que «servidor caído».
+            text = stringResource(
+                when (reason) {
+                    RefreshError.NO_CONNECTION -> R.string.error_no_connection
+                    RefreshError.TIMEOUT -> R.string.error_timeout
+                    RefreshError.SERVER -> R.string.error_server
+                    RefreshError.CLIENT -> R.string.error_client
+                    RefreshError.INVALID_RESPONSE -> R.string.error_invalid_response
+                    RefreshError.UNKNOWN -> R.string.error_unknown
+                },
+            ),
             color = MaterialTheme.colorScheme.error,
         )
         Button(onClick = onRetry) { Text(stringResource(R.string.retry)) }
@@ -407,4 +418,4 @@ private fun ProductsEmptyPreview() = PreviewContent(ProductsUiState.Empty, query
 
 @Preview(showBackground = true)
 @Composable
-private fun ProductsErrorPreview() = PreviewContent(ProductsUiState.Error("Simulated network error"))
+private fun ProductsErrorPreview() = PreviewContent(ProductsUiState.Error(RefreshError.NO_CONNECTION))

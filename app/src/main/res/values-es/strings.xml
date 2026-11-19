@@ -4,7 +4,12 @@
     <string name="app_name">MiTienda</string>
 
     <string name="loading">Cargando productos…</string>
-    <string name="error_message">Algo ha ido mal: %1$s</string>
+    <string name="error_no_connection">Sin conexión. Revisa tu internet e inténtalo de nuevo.</string>
+    <string name="error_timeout">El servidor tarda demasiado en responder. Inténtalo de nuevo.</string>
+    <string name="error_server">El servidor tiene problemas. Inténtalo más tarde.</string>
+    <string name="error_client">El servidor ha rechazado la petición.</string>
+    <string name="error_invalid_response">El servidor ha enviado datos que la app no puede leer.</string>
+    <string name="error_unknown">Algo ha ido mal.</string>
     <string name="showing_saved_data">Mostrando datos guardados. No se pudo actualizar.</string>
     <string name="filter_only_favorites">Solo favoritos</string>
     <string name="no_favorites">Aún no tienes favoritos</string>

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.android.application) // Convierte el módulo en una app Android (genera el APK)
     alias(libs.plugins.kotlin.compose)      // Compilador de Compose (transforma las funciones @Composable)
     alias(libs.plugins.ksp)                 // Genera código en compilación (lo usa Room)
+    alias(libs.plugins.kotlin.serialization) // Genera los convertidores JSON de las clases @Serializable
 }
 
 android {
@@ -95,6 +96,13 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
 
+    // Red: Retrofit (interfaz tipada) sobre OkHttp (cliente HTTP) + kotlinx.serialization (JSON)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.kotlinx.serialization.json)
+
     // DataStore: ajustes del usuario (preferencias clave-valor)
     implementation(libs.androidx.datastore.preferences)
 
@@ -104,6 +112,7 @@ dependencies {
     // Tests unitarios (JVM)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.okhttp.mockwebserver) // servidor HTTP falso para probar la capa de red sin internet
 
     // Tests instrumentados (dispositivo/emulador)
     androidTestImplementation(platform(libs.androidx.compose.bom))

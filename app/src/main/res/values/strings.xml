@@ -4,8 +4,12 @@
     <string name="app_name">MiTienda</string>
 
     <string name="loading">Loading products…</string>
-    <!-- %1$s: detalle técnico del error -->
-    <string name="error_message">Something went wrong: %1$s</string>
+    <string name="error_no_connection">No connection. Check your internet and try again.</string>
+    <string name="error_timeout">The server took too long to respond. Try again.</string>
+    <string name="error_server">The server is having problems. Try again later.</string>
+    <string name="error_client">The server rejected the request.</string>
+    <string name="error_invalid_response">The server sent data the app cannot read.</string>
+    <string name="error_unknown">Something went wrong.</string>
     <string name="showing_saved_data">Showing saved data. Could not refresh.</string>
     <string name="filter_only_favorites">Only favorites</string>
     <string name="no_favorites">No favorites yet</string>

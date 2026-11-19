@@ -1,29 +1,27 @@
 package com.example.pmdm.data.remote
 
-import com.example.pmdm.domain.model.Product
+import kotlinx.serialization.Serializable
 
 /**
- * Producto tal y como lo entrega la "API". Su forma la dicta el servidor, no la app.
- * Por eso es distinto de [Product]: si el servidor cambia un campo, solo se toca esta clase
- * y [toDomain], y el resto de la app no se entera.
+ * Producto tal y como lo entrega la API de dummyjson. Su forma la dicta el servidor, no la app.
+ * Por eso es distinto de [com.example.pmdm.domain.model.Product]: si el servidor cambia un campo,
+ * solo se toca esta clase y el mapeo del repositorio, y el resto de la app no se entera.
+ *
+ * `@Serializable` hace que el plugin de kotlinx.serialization genere, al compilar, el código que lee el JSON.
+ * Cada propiedad debe llamarse igual que el campo del JSON.
  */
+@Serializable
 data class ProductDto(
     val id: Int,
     val title: String,
-    val section: String,
-    val amount: Double,
-    val image: String,
+    val category: String,
+    val price: Double,
+    val thumbnail: String,
 )
 
 /**
- * Convierte el DTO en el modelo de dominio.
- * El DTO no trae información de favoritos, así que arranca en `false`.
+ * Respuesta de `GET /products`: el servidor envuelve la lista en un objeto (con más campos, como `total`,
+ * que no se necesitan y se ignoran).
  */
-fun ProductDto.toDomain() = Product(
-    id = id,
-    name = title,
-    category = section,
-    price = amount,
-    imageUrl = image,
-    favorite = false,
-)
+@Serializable
+data class ProductsResponse(val products: List<ProductDto>)

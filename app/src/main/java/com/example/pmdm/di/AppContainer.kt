@@ -4,7 +4,7 @@ import android.content.Context
 import com.example.pmdm.data.local.AppDatabase
 import com.example.pmdm.data.local.SettingsRepositoryImpl
 import com.example.pmdm.data.local.settingsDataStore
-import com.example.pmdm.data.remote.FakeProductApi
+import com.example.pmdm.data.remote.createProductApi
 import com.example.pmdm.data.repository.ProductRepositoryImpl
 import com.example.pmdm.domain.repository.ProductRepository
 import com.example.pmdm.domain.repository.SettingsRepository
@@ -26,7 +26,7 @@ class AppContainer(context: Context) {
      */
     val forceNetworkError = MutableStateFlow(false)
 
-    private val api = FakeProductApi(simulateError = { forceNetworkError.value })
+    private val api = createProductApi(simulateError = { forceNetworkError.value })
 
     private val database = AppDatabase.create(context)
 
